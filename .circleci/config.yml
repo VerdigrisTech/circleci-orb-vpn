@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   # Replace this with your own!
-  vpn: VerdigrisTech/vpn@<<pipeline.parameters.dev-orb-version>>
+  ikev2-vpn: verdigris/ikev2-vpn@<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@10.0
   bats: circleci/bats@1.0
   shellcheck: circleci/shellcheck@2.0
@@ -32,7 +32,7 @@ jobs:
       # "greet" is a sample command packaged with this orb config.
       # This sample integration test will run as long as the greet command exists. Once you remove the greet command you should remove this line.
       # Push new changes first, before adding new tests to your config.
-      - vpn/greet
+      # - ikev2-vpn/connect-vpn
 
 workflows:
   # Prior to producing a development orb (which requires credentials) basic validation, linting, and even unit testing can be performed.
@@ -50,7 +50,7 @@ workflows:
           path: ./src/tests
       # Publish development version(s) of the orb.
       - orb-tools/publish-dev:
-          orb-name: VerdigrisTech/vpn
+          orb-name: verdigris/ikev2-vpn
           context: orb-publishing # A restricted context containing your private publishing credentials. Will only execute if approved by an authorized user.
           requires:
             - orb-tools/lint
@@ -81,7 +81,7 @@ workflows:
       # be skipped.
       # e.g. [semver:patch] will cause a patch version to be published.
       - orb-tools/dev-promote-prod-from-commit-subject:
-          orb-name: VerdigrisTech/vpn
+          orb-name: verdigris/ikev2-vpn
           context: orb-publishing
           add-pr-comment: false
           fail-if-semver-not-indicated: true
