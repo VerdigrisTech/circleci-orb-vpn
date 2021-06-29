@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   # Replace this with your own!
-  vpn: verdigris/vpn@<<pipeline.parameters.dev-orb-version>>
+  vpn: VerdigrisTech/vpn@<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@10.0
   bats: circleci/bats@1.0
   shellcheck: circleci/shellcheck@2.0
@@ -50,7 +50,7 @@ workflows:
           path: ./src/tests
       # Publish development version(s) of the orb.
       - orb-tools/publish-dev:
-          orb-name: verdigris/vpn
+          orb-name: VerdigrisTech/vpn
           context: orb-publishing # A restricted context containing your private publishing credentials. Will only execute if approved by an authorized user.
           requires:
             - orb-tools/lint
@@ -81,7 +81,7 @@ workflows:
       # be skipped.
       # e.g. [semver:patch] will cause a patch version to be published.
       - orb-tools/dev-promote-prod-from-commit-subject:
-          orb-name: verdigris/vpn
+          orb-name: VerdigrisTech/vpn
           context: orb-publishing
           add-pr-comment: false
           fail-if-semver-not-indicated: true
