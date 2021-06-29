@@ -1,0 +1,25 @@
+description: >
+  This command connects to an ikev2 VPN given a prive key
+parameters:
+  password:
+    type: string
+    description: "PKCS12 password used to connect to the vpn"
+  hostname:
+    type: string
+    description: "The host to open the connection for"
+steps:
+  - run:
+      name: Install IKEv2 client
+      command: |
+        sudo apt-get update
+        sudo apt-get install -y charon-cmd
+  - run:
+      name: Extract certificates and private key
+      command: |
+        openssl pkcs12 -in circleci.p12 -passin "pass:<< parameters.password >>" -out circleci.pem -nokeys -nodes
+        openssl pkcs12 -in circleci.p12 -passin "pass:<< parameters.password >>" -out circleci.key -nocerts -nodes
+        chmod 600 circleci.key
+  - run:
+      name: Connect to VPN at << parameters.hostname >>
+      background: true
+      command: sudo charon-cmd --host << parameters.hostname >> --identity circleci --cert ca.pem --cert circleci.pem --rsa circleci.key
