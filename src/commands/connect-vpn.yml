@@ -22,8 +22,8 @@ steps:
   - run:
       name: Decode certificates
       command: |
-        base64 -d <<< << parameters.p12-b64 >> >> /tmp/circleci.p12
-        base64 -d <<< << parameters.ca-pem-b64 >> >> /tmp/ca.pem
+        base64 -d \<<< << parameters.p12-b64 >> \>> /tmp/circleci.p12
+        base64 -d \<<< << parameters.ca-pem-b64 >> \>> /tmp/ca.pem
   - run:
       name: Extract certificates and private key
       command: |
