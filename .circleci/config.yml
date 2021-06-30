@@ -32,7 +32,12 @@ jobs:
       # "greet" is a sample command packaged with this orb config.
       # This sample integration test will run as long as the greet command exists. Once you remove the greet command you should remove this line.
       # Push new changes first, before adding new tests to your config.
-      # - ikev2-vpn/connect-vpn
+      #- ikev2-vpn/connect: # context fields
+      #    password: $VPN_PKCS12_PASSWORD  
+      #    hostname: $VPN_HOSTNAME
+      #    p12-b64: $VPN_P12_B64 #Base64 encoded in context
+      #    ca-pem-b64: $VPN_CA_PEM_B64 #Base64 encoded in context
+      # TODO: check that connection works with a command? 
 
 workflows:
   # Prior to producing a development orb (which requires credentials) basic validation, linting, and even unit testing can be performed.
@@ -42,12 +47,6 @@ workflows:
     jobs:
       - orb-tools/lint # Lint Yaml files
       - orb-tools/pack # Pack orb source
-      - shellcheck/check:
-          dir: ./src/scripts
-          exclude: SC2148
-      # optional: Run BATS tests against your scripts
-      - bats/run:
-          path: ./src/tests
       # Publish development version(s) of the orb.
       - orb-tools/publish-dev:
           orb-name: verdigris/ikev2-vpn
