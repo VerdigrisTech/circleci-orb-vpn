@@ -1,5 +1,5 @@
 description: >
-  This command connects to an ikev2 VPN given a prive key
+  This command connects to an ikev2 VPN given a private key
 parameters:
   p12-b64:
     type: string
