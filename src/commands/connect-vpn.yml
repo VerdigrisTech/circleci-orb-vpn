@@ -1,12 +1,18 @@
 description: >
   This command connects to an ikev2 VPN given a prive key
 parameters:
+  p12-b64:
+    type: string
+    description: "B64 encoded PKCS12 certificate used to connect the the VPN"
   password:
     type: string
-    description: "PKCS12 password used to connect to the vpn"
+    description: "PKCS12 password used for the p12-b64 certificate"
+  ca-pem-b64:
+    type: string
+    description: "B64 encoded ca certificate used with the VPN"
   hostname:
     type: string
-    description: "The host to open the connection for"
+    description: "The hostname of the VPN"
 steps:
   - run:
       name: Install IKEv2 client
@@ -14,12 +20,17 @@ steps:
         sudo apt-get update
         sudo apt-get install -y charon-cmd
   - run:
+      name: Decode certificates
+      command: |
+        base64 -d <<< << parameters.p12-b64 >> >> /tmp/circleci.p12
+        base64 -d <<< << parameters.ca-pem-b64 >> >> /tmp/ca.pem
+  - run:
       name: Extract certificates and private key
       command: |
-        openssl pkcs12 -in circleci.p12 -passin "pass:<< parameters.password >>" -out circleci.pem -nokeys -nodes
-        openssl pkcs12 -in circleci.p12 -passin "pass:<< parameters.password >>" -out circleci.key -nocerts -nodes
+        openssl pkcs12 -in /tmp/circle.p12 -passin "pass:<< parameters.password >>" -out /tmp/circleci.pem -nokeys -nodes
+        openssl pkcs12 -in /tmp/circle.p12 -passin "pass:<< parameters.password >>" -out /tmp/circleci.key -nocerts -nodes
         chmod 600 circleci.key
   - run:
       name: Connect to VPN at << parameters.hostname >>
       background: true
-      command: sudo charon-cmd --host << parameters.hostname >> --identity circleci --cert ca.pem --cert circleci.pem --rsa circleci.key
+      command: sudo charon-cmd --host << parameters.hostname >> --identity circleci --cert /tmp/ca.pem --cert /tmp/circleci.pem --rsa /tmp/circleci.key
