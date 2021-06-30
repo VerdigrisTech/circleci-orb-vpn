@@ -29,7 +29,7 @@ steps:
       command: |
         openssl pkcs12 -in /tmp/circleci.p12 -passin "pass:<< parameters.password >>" -out /tmp/circleci.pem -nokeys -nodes
         openssl pkcs12 -in /tmp/circleci.p12 -passin "pass:<< parameters.password >>" -out /tmp/circleci.key -nocerts -nodes
-        chmod 600 circleci.key
+        chmod 600 /tmp/circleci.key
   - run:
       name: Connect to VPN at << parameters.hostname >>
       background: true
