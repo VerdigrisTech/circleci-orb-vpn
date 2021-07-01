@@ -1,13 +1,25 @@
 description: >
-  Sample example description.
-# Provide a use-case based example for using this orb.
-# Everything in the `usage` section will be displayed in the orb registry.
-# Comments are not retained.
+  An example creating a connection to the VPN and trying to lookup info on a server that exists in my VPC
 usage:
   version: 2.1
   orbs:
-    <orb-name>: <namespace>/<orb-name>@0.0.1
+    ikev2-vpn: verdigris/ikev2-vpn@<VERSION> #check the latest version
+  jobs:
+    test-connection:
+      machine: #IMPORTANT! Must use a machine executor
+        image: ubuntu-2004:202101-01
+      steps:
+        - ikev2-vpn/connect: # context fields
+            password: $VPN_PKCS12_PASSWORD  
+            hostname: $VPN_HOSTNAME
+            p12-b64: $VPN_P12_B64 #Base64 encoded in context
+            ca-pem-b64: $VPN_CA_PEM_B64 #Base64 encoded in context
+        - run: 
+            name: hit a private server
+            command: nslookup -query=soa <PRIVATE_DNS> <PRIVATE_IP>
   workflows:
-    use-my-orb:
+    version: 2
+    test:
       jobs:
-        - <orb-name>/<job-name>
+        - test-connection:
+            context: vpn
