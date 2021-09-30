@@ -2,11 +2,8 @@ version: 2.1
 
 orbs:
   # Replace this with your own!
-  vpn: verdigris/vpn@<<pipeline.parameters.dev-orb-version>>
+  # ikev2-vpn: verdigris/ikev2-vpn@<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@10.0
-  bats: circleci/bats@1.0
-  shellcheck: circleci/shellcheck@2.0
-
 # Pipeline Parameters
 ## These parameters are used internally by orb-tools. Skip to the Jobs section.
 parameters:
@@ -32,8 +29,12 @@ jobs:
       # "greet" is a sample command packaged with this orb config.
       # This sample integration test will run as long as the greet command exists. Once you remove the greet command you should remove this line.
       # Push new changes first, before adding new tests to your config.
-      - vpn/greet
-
+      #- ikev2-vpn/connect: # context fields
+      #    password: $VPN_PKCS12_PASSWORD
+      #    hostname: $VPN_HOSTNAME
+      #    p12-b64: $VPN_P12_B64 #Base64 encoded in context
+      #    ca-pem-b64: $VPN_CA_PEM_B64 #Base64 encoded in context
+      # TODO: check that connection works with a command?
 workflows:
   # Prior to producing a development orb (which requires credentials) basic validation, linting, and even unit testing can be performed.
   # This workflow will run on every commit
@@ -42,21 +43,13 @@ workflows:
     jobs:
       - orb-tools/lint # Lint Yaml files
       - orb-tools/pack # Pack orb source
-      - shellcheck/check:
-          dir: ./src/scripts
-          exclude: SC2148
-      # optional: Run BATS tests against your scripts
-      - bats/run:
-          path: ./src/tests
       # Publish development version(s) of the orb.
       - orb-tools/publish-dev:
-          orb-name: verdigris/vpn
+          orb-name: verdigris/ikev2-vpn
           context: orb-publishing # A restricted context containing your private publishing credentials. Will only execute if approved by an authorized user.
           requires:
             - orb-tools/lint
             - orb-tools/pack
-            - bats/run
-            - shellcheck/check
       # Trigger an integration workflow to test the
       # dev:${CIRCLE_SHA1:0:7} version of your orb
       - orb-tools/trigger-integration-tests-workflow:
@@ -81,7 +74,7 @@ workflows:
       # be skipped.
       # e.g. [semver:patch] will cause a patch version to be published.
       - orb-tools/dev-promote-prod-from-commit-subject:
-          orb-name: verdigris/vpn
+          orb-name: verdigris/ikev2-vpn
           context: orb-publishing
           add-pr-comment: false
           fail-if-semver-not-indicated: true
